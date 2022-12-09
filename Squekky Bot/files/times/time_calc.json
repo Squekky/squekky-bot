@@ -1,0 +1,10 @@
+{"ICT": ["Indochina Time [ICT]", "Asia/Phnom_Penh"],
+"IST":  ["Indian Standard Time [IST]", "Asia/Kolkata"],
+"CET":  ["Central European Time [CET]", "CET"],
+"GMT":  ["Greenwich Mean Time [GMT]", "GMT"],
+"BRT":  ["Brasilia Time [BRT]", "Brazil/East"],
+"EST":  ["Eastern Standard Time [EST]", "US/Eastern"],
+"CST":  ["Central Standard Time [CST]", "US/Central"],
+"MST":  ["Mountain Standard Time [MST]", "US/Mountain"],
+"PST":  ["Pacific Standard Time [PST]", "US/Pacific"],
+"HST":  ["Hawaiian Standard Time [HST]", "US/Hawaii"]}
