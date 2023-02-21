@@ -23,12 +23,6 @@ class Bot(commands.Bot):
 
     async def close(self):
         print("Bot Offline.")
-        channel = bot.get_channel(919315204096016384)
-        embed = discord.Embed(
-            color=0xFE2020
-        )
-        embed.add_field(name="Nap time!", value="squekky bot is taking a nap.", inline=False)
-        await channel.send(embed=embed)
         await super().close()
 
 
@@ -43,12 +37,6 @@ async def on_ready():
     activity = discord.Game(name="-help")
     await bot.change_presence(activity=activity, status="L")
     print('Bot Online.')
-    channel = bot.get_channel(919315204096016384)
-    embed = discord.Embed(
-        color=0x34FF1A
-    )
-    embed.add_field(name="Wakey wake!", value="squekky bot is awake!", inline=False)
-    await channel.send(embed=embed)
 
 
 def emb(ext, option):
