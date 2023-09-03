@@ -113,7 +113,7 @@ class Wordle(commands.Cog):
             title=f"Selected Word: {word_to_guess}",
             color=0x14CB10
         )
-        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
         count = 0
         for word in tried_words:
             count += 1
@@ -139,7 +139,7 @@ class Wordle(commands.Cog):
             description="Enter your first guess to begin the game!",
             color=0xFF7300
         )
-        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
         embed.set_footer(text="Type 'exit' to end the game")
         current_game = await ctx.send(embed=embed)
         tried_words = []
@@ -156,7 +156,7 @@ class Wordle(commands.Cog):
                 )
                 embed.add_field(name="You took too long to respond.", value=f"The word was: **{word_to_guess}**",
                                 inline=False)
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await ctx.send(embed=embed)
                 return
             if guess.upper() == 'EXIT':  # Allow the user to end the game if they wish
@@ -166,7 +166,7 @@ class Wordle(commands.Cog):
                 )
                 embed.add_field(name="You ended the game.", value=f"The word was: **{word_to_guess}**",
                                 inline=False)
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await ctx.send(embed=embed)
                 return
             elif len(guess) != 5 or guess.lower() not in words:  # Make sure the guess is valid
@@ -200,7 +200,7 @@ class Wordle(commands.Cog):
                     embed.add_field(name=f'Guess {count + 1}: {tried_words[count]}',
                                     value=f'{" ".join(tried_results[count])}', inline=False)
                     count += 1
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await current_game.edit(embed=embed)
 
     @commands.command()
@@ -220,7 +220,7 @@ class Wordle(commands.Cog):
             description="Enter your first guess to begin the game!",
             color=0xFF7300
         )
-        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
         embed.set_footer(text="Type 'exit' to end the game")
         current_game = await ctx.send(embed=embed)
         tried_words = []
@@ -238,7 +238,7 @@ class Wordle(commands.Cog):
                 )
                 embed.add_field(name="You took too long to respond.", value=f"The calculation was: **{embed_calc}**",
                                 inline=False)
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await ctx.send(embed=embed)
                 return
             if guess.upper() == 'EXIT':  # Allow the user to end the game if they wish
@@ -248,7 +248,7 @@ class Wordle(commands.Cog):
                 )
                 embed.add_field(name="You ended the game.", value=f"The calculation was: **{embed_calc}**",
                                 inline=False)
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await ctx.send(embed=embed)
                 return
             elif len(guess) != 8 or not eval(eval_guess):  # Make sure the guess is valid
@@ -283,9 +283,9 @@ class Wordle(commands.Cog):
                     embed.add_field(name=f'Guess {count + 1}: {tried_words[count]}',
                                     value=f'{" ".join(tried_results[count])}', inline=False)
                     count += 1
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await current_game.edit(embed=embed)
 
 
-def setup(bot):
-    bot.add_cog(Wordle(bot))
+async def setup(bot):
+    await bot.add_cog(Wordle(bot))
