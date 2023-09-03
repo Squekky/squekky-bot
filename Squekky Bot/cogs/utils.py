@@ -7,12 +7,14 @@ from discord.ext import commands
 # Help - 0xA600FF
 # Info - 0xC800FF
 
+
 async def get_help(command):
     embed = discord.Embed(
         title=f"{command}",
         color=0xB800FF
     )
     return embed
+
 
 async def hangman_stats_help(category):
     embed = await get_help(f"stats {category} [user]")
@@ -21,6 +23,7 @@ async def hangman_stats_help(category):
                     value="Accepts both user IDs and mentions\n\n"
                           f"**Example:** -stats {category} 489560386886959115")
     return embed
+
 
 async def hangman_help(category):
     embed = await get_help(f"{category} [page]")
@@ -31,6 +34,7 @@ async def hangman_help(category):
                           "**Cooldown:** 1 second\n"
                           f"**Example:** -{category} {random.randint(2, 3)}")
     return embed
+
 
 class Utils(commands.Cog):
     """ Provide statistics for the server """
@@ -61,7 +65,7 @@ class Utils(commands.Cog):
         embed.add_field(name="Music", value=f"{', '.join(music)}", inline=False)
         embed.add_field(name="Other", value=f"{', '.join(other)}", inline=False)
         embed.add_field(name="Moderation", value=f"{', '.join(moderation)}", inline=False)
-        embed.set_author(name=f"Squekky Bot Commands", icon_url=f"{self.bot.user.avatar_url}")
+        embed.set_author(name=f"Squekky Bot Commands", icon_url=f"{self.bot.user.avatar}")
         await ctx.send(embed=embed)
 
     @help.command(name='help', aliases=['cmds, commands'])
@@ -429,7 +433,7 @@ class Utils(commands.Cog):
                 description=f"Try again in `{time}`.",
                 color=0x800000
             )
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
         elif isinstance(error, commands.NotOwner):
             print(f"[{ctx.command}] {ctx.author} attempted to use an owner-only command.")
@@ -443,5 +447,6 @@ class Utils(commands.Cog):
             print(f"[{ctx.command}] {error.args[0]}")
             print(error.args)
 
-def setup(bot):
-    bot.add_cog(Utils(bot))
+
+async def setup(bot):
+    await bot.add_cog(Utils(bot))
