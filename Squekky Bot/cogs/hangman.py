@@ -15,6 +15,7 @@ from discord.ext import commands
 # Lose - 0xFF6675
 # Data/Statistics - 0x00CBE6
 
+
 class Hangman(commands.Cog):
     """ Play Hangman """
     def __init__(self, bot):
@@ -118,7 +119,7 @@ class Hangman(commands.Cog):
                 description=description,
                 color=color
             )
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             return embed
 
         def cheating_embed():
@@ -222,7 +223,7 @@ class Hangman(commands.Cog):
             embed.add_field(name="\nLetters", value=f"{' '.join(letters)}", inline=False)
             if contains_numbers:
                 embed.add_field(name="\nNumbers", value=f"{' '.join(numbers)}", inline=False)
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             embed.set_footer(text="Type 'exit' to end the game")
             await current_game.edit(embed=embed)
             if "\_ " not in mystery and "#" not in mystery:  # Check if all the letters have been guessed
@@ -256,6 +257,7 @@ class Hangman(commands.Cog):
             return
         with open(".\\files\\hangman\\words.json", 'r') as file:
             words = json.load(file)
+        print("good")
         collection_list = words[collection]
         max_pages = (len(collection_list) - 1) // keys_per_page + 1
         if page > max_pages or page <= 0:  # Prevent users from going over page limit
@@ -265,9 +267,10 @@ class Hangman(commands.Cog):
             )
             await channel.send(embed=embed)
             return
+
         missing = sorted(words[collection])
         category = collection.lower()
-        user_collected = await self.bot.pg_con.fetch(f"SELECT {category} FROM hangman_{category} WHERE user_id = $1"
+        user_collected = await self.bot.pg_con.fetch(f"SELECT {category} FROM hangman_{category} WHERE user_id = $1 "
                                                      f"ORDER BY {category} ASC", uid)
         totals = await self.bot.pg_con.fetch(f"SELECT total FROM hangman_{category} WHERE user_id = $1 "
                                              f"ORDER BY {category} ASC", uid)
@@ -320,7 +323,7 @@ class Hangman(commands.Cog):
             if item in missing:
                 embed.add_field(name=f"<:red_x:1005926523372585021> {item}", value="Missing.", inline=True)
         embed.set_footer(text=f"Page {page}/{max_pages}")
-        embed.set_author(name=f"{user}", icon_url=f"{user.avatar_url}")
+        embed.set_author(name=f"{user}", icon_url=f"{user.avatar}")
         await channel.send(embed=embed)
 
     @commands.command()
@@ -434,51 +437,51 @@ class Hangman(commands.Cog):
         embed.set_footer(text=f"From {total_points} data points")
         await ctx.send(embed=embed)
 
-    @commands.command()
-    @commands.is_owner()
-    async def graph(self, ctx, category):
-        if category.title() not in ["Disasters", "Games", "Countries", "States", "Teams", "Companies"]:  # Make sure
-            # it is a category
-            await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
-            return
-        category = category.lower()
-        with open(".\\files\\hangman\\words.json", 'r') as file:
-            words = json.load(file)[category.title()]
-        frequency = {}
-        data_points = 0;
-        for word in words:
-            total_count = 0
-            totals = await self.bot.pg_con.fetch(f"SELECT total FROM hangman_{category} WHERE {category} = $1", word)
-            for total in totals:
-                total_count += total['total']
-            frequency[word] = total_count
-            data_points += total_count
-        words = list(frequency.keys())
-        amounts = list(frequency.values())
-
-        fig, ax = plt.subplots(figsize=(25, 37.5))
-
-        ax.barh(words, amounts, height=0.8, color=['dodgerblue', 'deepskyblue'], align='center', edgecolor='white', linewidth=1)
-        ax.xaxis.set_tick_params(pad=1)
-        ax.yaxis.set_tick_params(pad=1)
-        ax.grid(b=True, color='grey',
-                linestyle='-.', linewidth=0.5,
-                alpha=0.2)
-        ax.invert_yaxis()
-        for i in ax.patches:
-            plt.text(i.get_width() + 0.1, i.get_y() + 0.7,
-                     str(round((i.get_width()), 2)),
-                     fontsize=1440*math.pow(len(frequency), -0.95), fontweight='bold',
-                     color='grey')
-        ax.set_title(f'Hangman {category.title()} Frequency - {data_points} data points',
-                     loc='left', fontsize=35)
-        plt.margins(y=0.001)
-        plt.yticks(fontsize=1390*math.pow(len(frequency), -0.95))
-        plt.savefig(".\\files\\graph.png", bbox_inches='tight')
-        plt.close(fig)
-        file = discord.File(".\\files\\graph.png")
-        await ctx.send(file=file)
-        return
+    #@commands.command()
+    #@commands.is_owner()
+    #async def graph(self, ctx, category):
+    #    if category.title() not in ["Disasters", "Games", "Countries", "States", "Teams", "Companies"]:  # Make sure
+    #        # it is a category
+    #        await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
+    #        return
+    #    category = category.lower()
+    #    with open(".\\files\\hangman\\words.json", 'r') as file:
+    #        words = json.load(file)[category.title()]
+    #    frequency = {}
+    #    data_points = 0;
+    #    for word in words:
+    #        total_count = 0
+    #        totals = await self.bot.pg_con.fetch(f"SELECT total FROM hangman_{category} WHERE {category} = $1", word)
+    #        for total in totals:
+    #            total_count += total['total']
+    #        frequency[word] = total_count
+    #        data_points += total_count
+    #    words = list(frequency.keys())
+    #    amounts = list(frequency.values())
+    #
+    #    fig, ax = plt.subplots(figsize=(25, 37.5))
+    #
+    #    ax.barh(words, amounts, height=0.8, color=['dodgerblue', 'deepskyblue'], align='center', edgecolor='white', linewidth=1)
+    #    ax.xaxis.set_tick_params(pad=1)
+    #    ax.yaxis.set_tick_params(pad=1)
+    #    ax.grid(b=True, color='grey',
+    #            linestyle='-.', linewidth=0.5,
+    #            alpha=0.2)
+    #    ax.invert_yaxis()
+    #    for i in ax.patches:
+    #        plt.text(i.get_width() + 0.1, i.get_y() + 0.7,
+    #                 str(round((i.get_width()), 2)),
+    #                 fontsize=1440*math.pow(len(frequency), -0.95), fontweight='bold',
+    #                 color='grey')
+    #    ax.set_title(f'Hangman {category.title()} Frequency - {data_points} data points',
+    #                 loc='left', fontsize=35)
+    #    plt.margins(y=0.001)
+    #    plt.yticks(fontsize=1390*math.pow(len(frequency), -0.95))
+    #    plt.savefig(".\\files\\graph.png", bbox_inches='tight')
+    #    plt.close(fig)
+    #    file = discord.File(".\\files\\graph.png")
+    #    await ctx.send(file=file)
+    #    return
 
     @commands.command()
     @commands.is_owner()
@@ -505,10 +508,10 @@ class Hangman(commands.Cog):
                 color=0x800000
             )
             embed.set_footer(text="Type 'exit' to end the game")
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
             error.error_handled = True
 
 
-def setup(bot):
-    bot.add_cog(Hangman(bot))
+async def setup(bot):
+    await bot.add_cog(Hangman(bot))
