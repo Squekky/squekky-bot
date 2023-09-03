@@ -6,6 +6,7 @@ from discord.ext import commands
 # Invalid Input - 0x800000
 # Calculation - 0x03C700
 
+
 class Maths(commands.Cog):
     """ Math Commands """
     def __init__(self, bot):
@@ -68,7 +69,7 @@ class Maths(commands.Cog):
                         title=f"Calculation takes too long! :(",
                         color=0x800000
                     )
-        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['fac'])
@@ -114,11 +115,11 @@ class Maths(commands.Cog):
                 description="Value is too large, but here you go!",
                 color=0x03C700
             )
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
             raise commands.errors.CommandInvokeError  # Raise an error to send the text file of the output
         else:
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
 
     @commands.command(aliases=['fib'])
@@ -169,18 +170,18 @@ class Maths(commands.Cog):
             textFile = open('.\\files\\math\\largeFibonacci.txt', 'w')  # Add the temporary value to a text file
             textFile.write(str(output))
             textFile.close()
-        embed.set_author(name=f"{ctx.author.name}#{ctx.author.discriminator}", icon_url=f"{ctx.author.avatar_url}")
+        embed.set_author(name=f"{ctx.author.name}#{ctx.author.discriminator}", icon_url=f"{ctx.author.avatar}")
         if len(str(output)) > 360:  # Prevent the embed descriptions from being too long
             embed = discord.Embed(
                 title=f"{stringTerm} term of the Fibonacci Sequence",
                 description="Term is too large, but here you go!",
                 color=0x03C700
             )
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
             raise commands.errors.CommandInvokeError  # Raise an error to send the text file of the output
         else:
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
 
     @prime.error
@@ -216,5 +217,6 @@ class Maths(commands.Cog):
             else:
                 print(error.original)
 
-def setup(bot):
-    bot.add_cog(Maths(bot))
+
+async def setup(bot):
+    await bot.add_cog(Maths(bot))
