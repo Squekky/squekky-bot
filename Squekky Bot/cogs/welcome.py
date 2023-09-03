@@ -22,7 +22,7 @@ class Welcome(commands.Cog):
             description=f"{member.mention} joined the server.",
             color=0xff4747
         )
-        embed.set_thumbnail(url=f"{member.avatar_url}")
+        embed.set_thumbnail(url=f"{member.avatar}")
         embed.set_footer(text=f"ID: {member.id}"
                               f"\nAccount Created: {created}")
         if member.guild.id == 760252418541223976:  # Make adjustments for Ambition
@@ -56,7 +56,7 @@ class Welcome(commands.Cog):
             description=f"{member.mention} left the server.",
             color=0xff4747
         )
-        embed.set_thumbnail(url=f"{member.avatar_url}")
+        embed.set_thumbnail(url=f"{member.avatar}")
         embed.set_footer(text=f"ID: {member.id}"
                               f"\nDate Joined: {joined}")
         if member.guild.id == 760252418541223976:  # Make adjustments for Ambition
@@ -71,5 +71,6 @@ class Welcome(commands.Cog):
                     await channel.send(embed=embed)
                     return
 
-def setup(bot):
-    bot.add_cog(Welcome(bot))
+
+async def setup(bot):
+    await bot.add_cog(Welcome(bot))
