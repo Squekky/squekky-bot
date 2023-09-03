@@ -9,6 +9,7 @@ from discord.ext import commands
 # Successful Suggestion - 0x04E000
 # Blacklisted User - 0x1F1F1F
 
+
 class Music(commands.Cog):
     """ Print the lyrics from any available Ariana Grande song in the current channel """
     def __init__(self, bot):
@@ -55,7 +56,7 @@ class Music(commands.Cog):
             title="Check your DMs!",
             color=0x16C533
         )
-        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
         await ctx.send(embed=embed)
         print(f'{user} played a song [{name.replace("_", " ")}]')
 
@@ -99,7 +100,7 @@ class Music(commands.Cog):
                 title="Check your DMs!",
                 color=0x16C533
             )
-            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
         except FileNotFoundError:
             embed = discord.Embed(
                 title="Invalid artist",
@@ -129,9 +130,8 @@ class Music(commands.Cog):
     @commands.is_owner()
     async def getsongs(self, ctx):
         channel = self.bot.get_channel(506322330352615434)
-        messages = await channel.history(limit=None).flatten()
-        with open(".\\files\\louis.txt", 'a') as file:
-            for message in messages:
+        with open(".\\files\\charlotte_spotify.txt", 'a') as file:
+            async for message in channel.history(limit=None):
                 for word in message.content.split():
                     if "spotify.com" in word:
                         try:
@@ -161,5 +161,6 @@ class Music(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(Music(bot))
+
+async def setup(bot):
+    await bot.add_cog(Music(bot))
