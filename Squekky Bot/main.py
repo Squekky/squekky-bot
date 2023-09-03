@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 import asyncpg
 import json
@@ -15,25 +17,30 @@ from discord.ext import commands
 intents = discord.Intents.default()
 intents.members = True
 intents.dm_messages = False
+intents.message_content = True
 
 
 class Bot(commands.Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs, command_prefix='-', case_insensitive=True, help_command=None, intents=intents)
+        self.pg_con = None
 
     async def close(self):
         print("Bot Offline.")
-        await super().close()
+
+    async def create_db_pool(self):
+        self.pg_con = await asyncpg.create_pool(database="postgres", user="postgres", password="password")
+
+    async def setup_hook(self):
+        await self.create_db_pool()
 
 
 bot = Bot()
 
-async def create_db_pool():
-    bot.pg_con = await asyncpg.create_pool(database="SQUEKKY_BOT", user="postgres", password=password)
 
 @bot.event
 async def on_ready():
-    """ Print when the bot is online and send a message in a status channel """
+    """ Print when the bot is online """
     activity = discord.Game(name="-help")
     await bot.change_presence(activity=activity, status="L")
     print('Bot Online.')
@@ -66,7 +73,7 @@ def emb(ext, option):
 async def load(ctx, loaded):
     """ Load a cog to avoid restarting the entire program """
     try:
-        bot.load_extension("cogs." + loaded)
+        await bot.load_extension("cogs." + loaded)
         await ctx.send(embed=emb(loaded, 'Loaded'))
         print(f"{loaded}.py was loaded.")
     except Exception as error:
@@ -78,7 +85,7 @@ async def load(ctx, loaded):
 async def unload(ctx, unloaded):
     """ Unload a cog to avoid restarting the entire program """
     try:
-        bot.unload_extension("cogs." + unloaded)
+        await bot.unload_extension("cogs." + unloaded)
         await ctx.send(embed=emb(unloaded, 'Unloaded'))
         print(f"{unloaded}.py was unloaded.")
     except Exception as error:
@@ -90,7 +97,7 @@ async def unload(ctx, unloaded):
 async def reload(ctx, reloaded):
     """ Reload a cog to avoid restarting the entire program """
     try:
-        bot.reload_extension("cogs." + reloaded)
+        await bot.reload_extension("cogs." + reloaded)
         await ctx.send(embed=emb(reloaded, 'Reloaded'))
         print(f"{reloaded}.py was reloaded.")
     except Exception as error:
@@ -105,9 +112,8 @@ if __name__ == '__main__':  # Start the bot when the program is run
     for extension in os.listdir('.\\cogs'):  # Load the extensions associated with the bot
         if extension.endswith('.py') and not extension.startswith('_'):
             try:
-                bot.load_extension(f"cogs.{extension.replace('.py', '')}")
+                asyncio.run(bot.load_extension(f"cogs.{extension.replace('.py', '')}"))
                 print(f"{extension} was loaded.")
             except Exception as error:  # Alert the user of any errors that occur when loading extensions
                 print(f"{extension} cannot be loaded. [{error}]")
-    bot.loop.run_until_complete(create_db_pool())
     bot.run(token)
