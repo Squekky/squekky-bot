@@ -84,8 +84,7 @@ class Fun(commands.Cog):
         )
         reactions = {}
         async with ctx.typing():
-            messages = await channel.history(limit=None, oldest_first=False).flatten()
-            for message in messages:  # Iterate through all the messages
+            async for message in channel.history(limit=None, oldest_first=False):  # Iterate through all the messages
                 count = 0
                 reaction_emoji = ''
                 if not message.reactions:  # Ignore if the message has no reactions
@@ -103,7 +102,7 @@ class Fun(commands.Cog):
                 reaction_count = message[1][1]
                 embed.add_field(name=f"{placement}. {user}", value=f"{reaction_count} {reaction}", inline=False)
         await ctx.send(embed=embed)
-        await ctx.send("<@!489560386886959115> check completed!")
+        await ctx.send("<@!590719451322646548> check completed!")
         with open(".\\files\\messages.json", 'w') as file:
             json.dump(str(sorted_reactions), file)
 
@@ -165,8 +164,9 @@ class Fun(commands.Cog):
                 color=0xCB1010
             )
         file_dimensions = math.sqrt(amount)  # Adjust the dimensions of the file depending on the amount of dice
-        combined_dice = Image.new("RGBA", (256 * (math.ceil(file_dimensions)), 256 * (math.floor(file_dimensions))))
+        combined_dice = Image.new("RGBA", (256 * (math.ceil(file_dimensions)), 256 * (round(file_dimensions))))
         dimensions = math.ceil(file_dimensions)
+        print(dimensions)
         squekky = self.bot.get_user(489560386886959115)
         async with ctx.typing():
             for dice in range(amount):
@@ -180,7 +180,7 @@ class Fun(commands.Cog):
         combined_dice.save('.\\files\\dice\\rolls\\' + file_name)  # Save the image to the dice folder
         file = discord.File('.\\files\\dice\\rolls\\' + file_name, filename=file_name)
         embed.set_thumbnail(url=f"attachment://{file_name}")
-        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
         await ctx.send(file=file, embed=embed)
         user = await self.bot.pg_con.fetchrow("SELECT * FROM dice WHERE user_id = $1", uid)
         if not user:
@@ -311,7 +311,7 @@ class Fun(commands.Cog):
             title=f"Dice Rolling Statistics",
             color=0x00CBE6
         )
-        embed.set_author(name=f"{user}", icon_url=f"{user.avatar_url}")
+        embed.set_author(name=f"{user}", icon_url=f"{user.avatar}")
         embed.add_field(name="Total Rolls:", value=f"{uid['rolls']}", inline=False)
         embed.add_field(name="Highest Roll:", value=f"{uid['highest_score']}", inline=False)
         embed.add_field(name="Highest Guess:", value=f"{uid['highest_guess']}", inline=False)
@@ -330,7 +330,7 @@ class Fun(commands.Cog):
             title=f"Yahtzee Statistics",
             color=0x00CBE6
         )
-        embed.set_author(name=f"{user}", icon_url=f"{user.avatar_url}")
+        embed.set_author(name=f"{user}", icon_url=f"{user.avatar}")
         embed.add_field(name="Highest Score:", value=f"{uid['score']}", inline=False)
         await ctx.send(embed=embed)
 
@@ -361,7 +361,7 @@ class Fun(commands.Cog):
             title=f"Hangman Statistics",
             color=0x00CBE6
         )
-        embed.set_author(name=f"{user}", icon_url=f"{user.avatar_url}")
+        embed.set_author(name=f"{user}", icon_url=f"{user.avatar}")
         embed.add_field(name="Disasters", value=f"Total: {disasters['Total']}\n"
                                                 f"Collected: {disasters['Collected']}\n", inline=False)
         embed.add_field(name="Games", value=f"Total: {games['Total']}\n"
@@ -430,7 +430,7 @@ class Fun(commands.Cog):
             title=f"Hangman {category.title()} Statistics",
             color=0x00CBE6
         )
-        embed.set_author(name=f"{user}", icon_url=f"{user.avatar_url}")
+        embed.set_author(name=f"{user}", icon_url=f"{user.avatar}")
         embed.add_field(name=f"Total {category.title()}:", value=f"{total_points}", inline=False)
         embed.add_field(name=f"Most Collected [{most_amount}]:", value=f"{most}", inline=False)
         embed.add_field(name=f"Least Collected [{least_amount}]:", value=f"{least}", inline=False)
@@ -491,6 +491,32 @@ class Fun(commands.Cog):
             await ctx.send(embed=embed)
             error.error_handled = True
 
+    @commands.command()
+    @commands.is_owner()
+    async def importdata(self, ctx, category):
+        with open(f".\\files\\data\\{category}.txt", 'r') as file:
+            data = file.read()
+        data = data.split("\n")
+        for item in data:
+            item = item.split("\t")
+            uid = item[0]
+            if category.lower() == "dice":
+                rolls = int(item[1])
+                highest_score = int(item[2])
+                highest_guess = int(item[3])
+                await self.bot.pg_con.execute(f"INSERT INTO dice (user_id, rolls, highest_score, highest_guess)"
+                                              f"VALUES ($1, $2, $3, $4)", uid, rolls, highest_score, highest_guess)
+            elif category.lower() == "yahtzee":
+                score = int(item[1])
+                await self.bot.pg_con.execute(f"INSERT INTO yahtzee (user_id, score)"
+                                              f"VALUES ($1, $2)", uid, score)
+            else:
+                word = item[1]
+                total = int(item[2])
+                await self.bot.pg_con.execute(f"INSERT INTO hangman_{category} (user_id, {category}, total)"
+                                              f"VALUES ($1, $2, $3)", uid, word, total)
+        print("SUCCESS")
 
-def setup(bot):
-    bot.add_cog(Fun(bot))
+
+async def setup(bot):
+    await bot.add_cog(Fun(bot))
