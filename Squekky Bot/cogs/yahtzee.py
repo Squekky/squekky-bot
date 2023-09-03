@@ -6,6 +6,7 @@ import os
 from discord.ext import commands
 from PIL import Image
 
+
 class Yahtzee(commands.Cog):
     """ Play Yahtzee """
     def __init__(self, bot):
@@ -69,7 +70,7 @@ class Yahtzee(commands.Cog):
                 color=0xFF7300
             )
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+            embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
             play_embed = await ctx.send(embed=embed)
             while True:
                 try:
@@ -90,7 +91,7 @@ class Yahtzee(commands.Cog):
                         description=category_list,
                         color=0x800000
                     )
-                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                     await play_embed.edit(embed=embed)
                     continue
                 elif categories[played.content.title()] != '`-`':
@@ -99,7 +100,7 @@ class Yahtzee(commands.Cog):
                         description=category_list,
                         color=0x800000
                     )
-                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 elif played.content.upper() == 'ONES':
                     categories["Ones"] = rolled_dice.count(1) + yahtzee_bonus([1])
                     break
@@ -206,8 +207,8 @@ class Yahtzee(commands.Cog):
                 )
                 for category in categories.keys():
                     embed.add_field(name=category, value=categories[category], inline=True)
-                embed.set_thumbnail(url=ctx.author.avatar_url)
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_thumbnail(url=ctx.author.avatar)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 if await on_end():
                     embed.set_footer(text="New high score!")
                 game = await ctx.send(embed=embed)
@@ -242,8 +243,8 @@ class Yahtzee(commands.Cog):
             for category in categories.keys():  # Created embed fields for score in each category
                 embed.add_field(name=category, value=categories[category], inline=True)
             embed.set_image(url=f"attachment://{file_name}")
-            embed.set_thumbnail(url=ctx.author.avatar_url)
-            embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+            embed.set_thumbnail(url=ctx.author.avatar)
+            embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
             embed.set_footer(text="Type 'exit' to end the game")
             game = await ctx.send(file=file, embed=embed)
             os.remove(f'.\\files\\dice\\yahtzee\\{file_name}')
@@ -286,7 +287,7 @@ class Yahtzee(commands.Cog):
                     description="For example, if you want to keep the 1st and 3rd dice, respond with: `13`",
                     color=0xFF7300
                 )
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 embed.set_footer(text="Type 'done' finish selecting.")
                 kept_embed = await ctx.send(embed=embed)
                 while True:
@@ -303,7 +304,7 @@ class Yahtzee(commands.Cog):
                         )
                         embed.add_field(name="You took too long to respond.", value=f"Your score was: **{score}**",
                                         inline=False)
-                        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                         await ctx.send(embed=embed)
                         await on_end()
                         return
@@ -323,7 +324,7 @@ class Yahtzee(commands.Cog):
                             description=kept_text,
                             color=0xFF7300
                         )
-                        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                         embed.set_footer(text="Type 'done' finish selecting.")
                         await kept_embed.edit(embed=embed)
             elif selection.content.upper().split()[0] == 'KEEP':  # Allow one line to be used to keep dice
@@ -342,7 +343,7 @@ class Yahtzee(commands.Cog):
                 )
                 embed.add_field(name="You ended the game.", value=f"Your score was: **{score}**",
                                 inline=False)
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await ctx.send(embed=embed)
                 await on_end()
                 return
@@ -357,9 +358,10 @@ class Yahtzee(commands.Cog):
                                 f"`keep` to select dice to keep then reroll",
                     color=0x800000
                 )
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
                 await ctx.send(embed=embed)
             await game.delete()
 
-def setup(bot):
-    bot.add_cog(Yahtzee(bot))
+
+async def setup(bot):
+    await bot.add_cog(Yahtzee(bot))
