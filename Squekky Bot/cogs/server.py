@@ -77,5 +77,6 @@ class Server(commands.Cog):
             await ctx.send(embed=embed)
             error.error_handled = True
 
-def setup(bot):
-    bot.add_cog(Server(bot))
+
+async def setup(bot):
+    await bot.add_cog(Server(bot))
