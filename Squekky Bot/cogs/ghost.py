@@ -5,6 +5,7 @@ from discord.ext import commands
 # Embed Color Palette
 # Ghost - 0x7FFF5C
 
+
 class Ghost(commands.Cog):
     """ Enables users the ability to ghost ping or opt in/out of being ghost pinged """
     def __init__(self, bot):
@@ -116,5 +117,6 @@ class Ghost(commands.Cog):
             await ctx.send(embed=embed)
             error.error_handled = True
 
-def setup(bot):
-    bot.add_cog(Ghost(bot))
+
+async def setup(bot):
+    await bot.add_cog(Ghost(bot))
