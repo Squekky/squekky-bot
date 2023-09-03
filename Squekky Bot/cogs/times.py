@@ -10,6 +10,7 @@ from datetime import datetime
 # Timezone List - 0xF7B21D
 # Invalid Input - 0xC20000
 
+
 class Times(commands.Cog):
     """ Convert the current time into a variety of timezones """
     def __init__(self, bot):
@@ -120,7 +121,7 @@ class Times(commands.Cog):
                 title=f"Pong! Took {ping} ms",
                 color=0xE00F00
             )
-        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
         await message.edit(message=" ", embed=embed)
 
     @time.error
@@ -140,5 +141,6 @@ class Times(commands.Cog):
             error.error_handled = True
             return
 
-def setup(bot):
-    bot.add_cog(Times(bot))
+
+async def setup(bot):
+    await bot.add_cog(Times(bot))
