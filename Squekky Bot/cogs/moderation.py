@@ -6,6 +6,7 @@ from discord.ext import commands
 # Unmute User - 0x17EE69
 # Error - 0xFFCD42
 
+
 class Moderation(commands.Cog):
     """ Moderation commands used for the bot """
     def __init__(self, bot):
@@ -93,5 +94,6 @@ class Moderation(commands.Cog):
         if '🖕' in message.content:
             await message.delete()
 
-def setup(bot):
-    bot.add_cog(Moderation(bot))
+
+async def setup(bot):
+    await bot.add_cog(Moderation(bot))
