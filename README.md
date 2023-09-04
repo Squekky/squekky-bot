@@ -1,0 +1,2 @@
+# squekky-bot
+Discord bot
