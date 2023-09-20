@@ -106,7 +106,7 @@ class Maths(commands.Cog):
                     description=f"{result}",
                     color=0x03C700
                 )
-        textFile = open('.\\files\\math\\largeFactorial.txt', 'w')  # Add the temporary value to a text file
+        textFile = open('./files/math/largeFactorial.txt', 'w')  # Add the temporary value to a text file
         textFile.write(str(result))
         textFile.close()
         if len(str(result)) > 360:  # Prevent the embed descriptions from being too long
@@ -167,7 +167,7 @@ class Maths(commands.Cog):
                     description=f"{output}",
                     color=0x03C700
                 )
-            textFile = open('.\\files\\math\\largeFibonacci.txt', 'w')  # Add the temporary value to a text file
+            textFile = open('./files/math/largeFibonacci.txt', 'w')  # Add the temporary value to a text file
             textFile.write(str(output))
             textFile.close()
         embed.set_author(name=f"{ctx.author.name}#{ctx.author.discriminator}", icon_url=f"{ctx.author.avatar}")
@@ -201,7 +201,7 @@ class Maths(commands.Cog):
         if isinstance(error, commands.errors.CommandInvokeError):
             new_error = error.original
             if isinstance(new_error, TypeError):
-                await ctx.send(file=discord.File('.\\files\\math\\largeFactorial.txt'))
+                await ctx.send(file=discord.File('./files/math/largeFactorial.txt'))
                 error.error_handled = True
             else:
                 print(new_error)
@@ -212,7 +212,7 @@ class Maths(commands.Cog):
         if isinstance(error, commands.errors.CommandInvokeError):
             new_error = error.original
             if isinstance(new_error, TypeError):
-                await ctx.send(file=discord.File('.\\files\\math\\largeFibonacci.txt'))
+                await ctx.send(file=discord.File('./files/math/largeFibonacci.txt'))
                 error.error_handled = True
             else:
                 print(error.original)

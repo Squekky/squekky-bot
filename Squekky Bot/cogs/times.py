@@ -20,8 +20,8 @@ class Times(commands.Cog):
     async def time(self, ctx, timezone):
         """ Send an embed containing the current time in a provided timezone """
         timezone = timezone.upper()
-        path = ".\\files\\times\\"
-        with open('.\\files\\times\\time_calc.json', 'r') as file:
+        path = "./files/times/"
+        with open('./files/times/time_calc.json', 'r') as file:
             tz_dict = dict(json.load(file))
         try:
             name = tz_dict[timezone][0]
@@ -48,7 +48,10 @@ class Times(commands.Cog):
     @commands.command()
     async def times(self, ctx, *continents):
         """ Send an embed containing the current time in different timezones """
-        tz_dict = {"Indochina Time [ICT]": pytz.timezone('Asia/Phnom_Penh'),
+        tz_dict = {'Australia Eastern Standard Time [AEST]': pytz.timezone('Australia/Canberra'),
+		   'Australia Central Standard Time [ACST]': pytz.timezone('Australia/Adelaide'),
+		   'Australia Western Standard Time [AWST]': pytz.timezone('Australia/Perth'),
+		   'Indochina Time [ICT]': pytz.timezone('Asia/Phnom_Penh'),
                    'Indian Standard Time [IST]': pytz.timezone('Asia/Kolkata'),
                    'Central European Time [CET]': pytz.timezone('CET'),
                    'Greenwich Mean Time [GMT]': pytz.timezone('GMT'),
@@ -63,7 +66,7 @@ class Times(commands.Cog):
             color=0xE67A00
         )
         for tz in tz_dict:  # Add a new field to the embed for each timezone
-            current_time = datetime.now(tz_dict[tz]).strftime("%I:%M %p, %B %d").lstrip('0')  # Format the current
+            current_time = datetime.now(tz_dict[tz]).strftime("%I:%M %p, %b %d").lstrip('0')  # Format the current
             # time into a string and remove leading zeros
             if current_time[-2] == "0":
                 current_time = current_time[:-2] + current_time[-1]
@@ -75,7 +78,10 @@ class Times(commands.Cog):
         """ Provide a list of applicable timezones for -time command """
         embed = discord.Embed(
             title=f"List of Available Timezones",
-            description="ICT - Indochina Time\n"
+            description="AEST - Australia Eastern Standard Time\n"
+			"ACST - Australia Central Standard Time\n"
+			"AWST - Australia Western Standard Time\n"
+			"ICT - Indochina Time\n"
                         "IST - Indian Standard Time\n"
                         "CET - Central European Time\n"
                         "GMT - Greenwich Mean Time\n"

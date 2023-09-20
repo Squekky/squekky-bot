@@ -103,7 +103,7 @@ class Fun(commands.Cog):
                 embed.add_field(name=f"{placement}. {user}", value=f"{reaction_count} {reaction}", inline=False)
         await ctx.send(embed=embed)
         await ctx.send("<@!590719451322646548> check completed!")
-        with open(".\\files\\messages.json", 'w') as file:
+        with open("./files/messages.json", 'w') as file:
             json.dump(str(sorted_reactions), file)
 
     @commands.command()
@@ -135,7 +135,7 @@ class Fun(commands.Cog):
         for dice in range(amount):  # Roll the provided amount of dice and sum them
             current_dice = random.randint(1, 6)
             rolled_dice.append(str(current_dice))
-            dice_images.append('.\\files\\dice\\' + rolled_dice[dice] + "_dice.png")
+            dice_images.append('./files/dice/' + rolled_dice[dice] + "_dice.png")
             dice_sum += current_dice
         if guess > 6 * amount or guess < amount:  # Make sure the guess is logical
             embed = discord.Embed(
@@ -166,7 +166,6 @@ class Fun(commands.Cog):
         file_dimensions = math.sqrt(amount)  # Adjust the dimensions of the file depending on the amount of dice
         combined_dice = Image.new("RGBA", (256 * (math.ceil(file_dimensions)), 256 * (round(file_dimensions))))
         dimensions = math.ceil(file_dimensions)
-        print(dimensions)
         squekky = self.bot.get_user(489560386886959115)
         async with ctx.typing():
             for dice in range(amount):
@@ -177,8 +176,8 @@ class Fun(commands.Cog):
                 dice_image = Image.open(dice_images[dice]).resize((256, 256))
                 combined_dice.paste(dice_image, ((dice % dimensions) * 256, math.floor(dice / dimensions) * 256))
         file_name = str(uuid.uuid4()) + ".png"  # Generate a random filename for each roll
-        combined_dice.save('.\\files\\dice\\rolls\\' + file_name)  # Save the image to the dice folder
-        file = discord.File('.\\files\\dice\\rolls\\' + file_name, filename=file_name)
+        combined_dice.save('./files/dice/rolls/' + file_name)  # Save the image to the dice folder
+        file = discord.File('./files/dice/rolls/' + file_name, filename=file_name)
         embed.set_thumbnail(url=f"attachment://{file_name}")
         embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
         await ctx.send(file=file, embed=embed)
@@ -192,7 +191,7 @@ class Fun(commands.Cog):
             await self.bot.pg_con.execute("UPDATE dice SET highest_score = $1 WHERE user_id = $2", dice_sum, uid)
         if dice_sum == guess and guess > user['highest_guess']:  # Increase highest guess if applicable
             await self.bot.pg_con.execute("UPDATE dice SET highest_guess = $1 WHERE user_id = $2", dice_sum, uid)
-        os.remove('.\\files\\dice\\rolls\\' + file_name)
+        os.remove('./files/dice/rolls/' + file_name)
 
     async def get_leaderboard(self, leaderboard, category, title, page):
         # await ctx.send(embed=await self.get_leaderboard("dice", "rolls", "Most Dice Rolls", page))
@@ -267,7 +266,7 @@ class Fun(commands.Cog):
             description="**Use `-leaderboard (category)` to see the leaderboard of a category.**\n\n"
                         "**Dice**\n"
                         "`rolls`\n"
-                        "`score`\n "
+                        "`score`\n"
                         "`guess`\n\n"
                         "**Yahtzee**\n"
                         "`yahtzee`",
@@ -335,7 +334,7 @@ class Fun(commands.Cog):
         await ctx.send(embed=embed)
 
     async def get_stats(self, user, category):
-        with open(".\\files\\hangman\\words.json", 'r') as file:
+        with open("./files/hangman/words.json", 'r') as file:
             words = json.load(file)
         user_collection = await self.bot.pg_con.fetch(f"SELECT * FROM hangman_{category.lower()} WHERE user_id = $1",
                                                       str(user.id))
@@ -380,7 +379,7 @@ class Fun(commands.Cog):
 
     async def get_hangman_stats(self, user, channel, category):
         category = category.lower()
-        with open(".\\files\\hangman\\words.json") as file:
+        with open("./files/hangman/words.json") as file:
             words = json.load(file)
         words = words[category.title()]
         frequency = {}
@@ -494,7 +493,7 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def importdata(self, ctx, category):
-        with open(f".\\files\\data\\{category}.txt", 'r') as file:
+        with open(f"./files/data/{category}.txt", 'r') as file:
             data = file.read()
         data = data.split("\n")
         for item in data:

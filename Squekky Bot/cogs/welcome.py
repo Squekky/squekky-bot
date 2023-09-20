@@ -12,7 +12,10 @@ class Welcome(commands.Cog):
     async def on_member_join(self, member):
         """ Send a welcome message in the main channel when a member leaves """
         channels = ['join-log', 'general', 'lobby']
-        oldtime = timezone('UTC').localize(member.created_at)  # Convert the time from UTC to Eastern Time
+        try:
+            oldtime = timezone('UTC').localize(member.created_at)  # Convert the time from UTC to Eastern Time
+        except ValueError:
+            oldtime = member.created_at
         newtime = oldtime.astimezone(timezone('America/New_York'))
         created = newtime.strftime('%B %d, %Y at %I:%M %p [%Z]')  # Convert the time into a string using datetime format
         if created[-14] == '0':

@@ -224,11 +224,11 @@ class Yahtzee(commands.Cog):
             rolls -= 1
             new_image = Image.new("RGBA", (1280, 256))  # Create a new image for the embed
             for dice in range(5):  # Add the dice images to the new image
-                dice_image = Image.open(f".\\files\\dice\\{rolled_dice[dice]}_dice.png").resize((256, 256))
+                dice_image = Image.open(f"./files/dice/{rolled_dice[dice]}_dice.png").resize((256, 256))
                 new_image.paste(dice_image, (dice*256, 0))
             file_name = str(uuid.uuid4()) + ".png"  # Generate a random filename for each roll
-            new_image.save(f".\\files\dice\yahtzee\\{file_name}")
-            file = discord.File(f".\\files\dice\yahtzee\\{file_name}", filename=file_name)
+            new_image.save(f"./files/dice/yahtzee/{file_name}")
+            file = discord.File(f"./files/dice/yahtzee/{file_name}", filename=file_name)
             score = get_score()
             embed = discord.Embed(
                 title="Yahtzee",
@@ -247,7 +247,7 @@ class Yahtzee(commands.Cog):
             embed.set_author(name=ctx.author, icon_url=ctx.author.avatar)
             embed.set_footer(text="Type 'exit' to end the game")
             game = await ctx.send(file=file, embed=embed)
-            os.remove(f'.\\files\\dice\\yahtzee\\{file_name}')
+            os.remove(f'./files/dice/yahtzee/{file_name}')
             if rolls == 0:  # Make the user play a category if they are out of rolls
                 embed = discord.Embed()
                 stop_check = await play()

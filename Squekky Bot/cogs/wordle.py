@@ -38,9 +38,9 @@ class Wordle(commands.Cog):
     @commands.command()
     @commands.is_owner()  # Owner-only command
     async def wordlecheck(self, ctx, input_word: str):
-        with open(".\\files\\wordle\\word_frequency_bot.json") as file:
+        with open("./files/wordle/word_frequency_bot.json") as file:
             frequency = json.load(file)
-        with open(".\\files\\wordle\\wordle_words_bot.txt") as file:
+        with open("./files/wordle/wordle_words_bot.txt") as file:
             words = [word.strip() for word in file.readlines()]
         word_to_guess = input_word.lower()
         if word_to_guess.upper() == 'RANDOM':
@@ -124,9 +124,9 @@ class Wordle(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 10, commands.BucketType.user)  # 10-second cooldown
     async def wordle(self, ctx):
-        with open(".\\files\\wordle\\word_frequency_bot.json") as file:
+        with open("./files/wordle/word_frequency_bot.json") as file:
             frequency = json.load(file)
-        with open(".\\files\\wordle\\wordle_words_bot.txt") as file:
+        with open("./files/wordle/wordle_words_bot.txt") as file:
             words = [word.strip() for word in file.readlines()]
         word_to_guess = sorted(words, key=frequency.get, reverse=True)[random.randint(0, 2000)]  # Only include the
         # 2500 most frequent words
@@ -207,7 +207,7 @@ class Wordle(commands.Cog):
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 10, commands.BucketType.user)  # 10-second cooldown
     async def nerdle(self, ctx):
-        with open(".\\files\\wordle\\nerdle_equations.json") as f:
+        with open("./files/wordle/nerdle_equations.json") as f:
             calculations = json.load(f)
         calculation = calculations[random.randint(0, len(calculations) - 1)]
         embed_calc = calculation.replace("*", "\*")

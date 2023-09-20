@@ -3,7 +3,6 @@ import asyncio
 import random
 import math
 import json
-import matplotlib.pyplot as plt  # For graph command
 from discord.ext import commands
 
 # Embed Color Palette
@@ -23,7 +22,7 @@ class Hangman(commands.Cog):
 
     @commands.command()
     @commands.max_concurrency(1, commands.BucketType.user)  # Prevent user from having more than 1 ongoing game
-    @commands.cooldown(1, 60, commands.BucketType.user)  # 10-second cooldown
+    @commands.cooldown(1, 60, commands.BucketType.user)  # 60-second cooldown
     async def hangman(self, ctx, user_input=None):
         await asyncio.sleep(0.5)
         channel = ctx.channel
@@ -58,7 +57,7 @@ class Hangman(commands.Cog):
             self.hangman.reset_cooldown(ctx)
             return
 
-        with open(".\\files\\hangman\\words.json", 'r') as file:
+        with open("./files/hangman/words.json", 'r') as file:
             words = json.load(file)
         word_count = len(words[user_input]) - 1
         selection = random.randint(0, word_count)
@@ -68,7 +67,7 @@ class Hangman(commands.Cog):
         else:
             country = ''
         if category == "team":
-            with open(".\\files\\hangman\\sports_teams.json", 'r') as file:
+            with open("./files/hangman/sports_teams.json", 'r') as file:
                 sports = json.load(file)
             teams = list(sports.values())
             for item in teams:
@@ -255,9 +254,8 @@ class Hangman(commands.Cog):
             page = int(page)
         else:
             return
-        with open(".\\files\\hangman\\words.json", 'r') as file:
+        with open("./files/hangman/words.json", 'r') as file:
             words = json.load(file)
-        print("good")
         collection_list = words[collection]
         max_pages = (len(collection_list) - 1) // keys_per_page + 1
         if page > max_pages or page <= 0:  # Prevent users from going over page limit
@@ -371,12 +369,12 @@ class Hangman(commands.Cog):
     @commands.command()
     @commands.is_owner()  # Owner-only command
     async def data(self, ctx, category):
-        if category.title() not in ["Disasters", "Games", "Countries", "States", "Teams", "Companies"]:  # Make sure
-            # it is a category
+        # Make sure it is a category
+        if category.title() not in ["Disasters", "Games", "Capitals", "Countries", "States", "Teams", "Companies"]:
             await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
             return
         category = category.lower()
-        with open(".\\files\\hangman\\words.json") as file:
+        with open("./files/hangman/words.json") as file:
             words = json.load(file)
         words = words[category.title()]
         frequency = {}
@@ -445,7 +443,7 @@ class Hangman(commands.Cog):
     #        await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
     #        return
     #    category = category.lower()
-    #    with open(".\\files\\hangman\\words.json", 'r') as file:
+    #    with open("./files/hangman/words.json", 'r') as file:
     #        words = json.load(file)[category.title()]
     #    frequency = {}
     #    data_points = 0;
@@ -477,9 +475,9 @@ class Hangman(commands.Cog):
     #                 loc='left', fontsize=35)
     #    plt.margins(y=0.001)
     #    plt.yticks(fontsize=1390*math.pow(len(frequency), -0.95))
-    #    plt.savefig(".\\files\\graph.png", bbox_inches='tight')
+    #    plt.savefig("./files/graph.png", bbox_inches='tight')
     #    plt.close(fig)
-    #    file = discord.File(".\\files\\graph.png")
+    #    file = discord.File("./files/graph.png")
     #    await ctx.send(file=file)
     #    return
 
