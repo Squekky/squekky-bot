@@ -67,11 +67,8 @@ Show your collected and missing sports teams
 * **stats** (category) [user]  
 Show your own or a given user's statistics in a given category. Use the command with no parameters for the list of categories
 
-* **leaderboard** (category) [page]  
-Show the leaderboard for a given category
-
-* **leaderboards**  
-Provide a list of leaderboard categories
+* **leaderboard** [category] [page]  
+Show the leaderboard for a given category, or provide a list of available leaderboards if no category is provided
 
 ### Math
 * **prime** (number)  
@@ -92,3 +89,10 @@ Get the current time in all available timezones
 
 * **timezones**  
 Provide a list of available timezones
+
+* **timezoneset** (timezone)  
+Set your timezone using GMT/UTC offsets
+
+* **timefor** [user]  
+heck the current time for a specific user, or yourself if no user is provided
+
