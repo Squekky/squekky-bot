@@ -2,8 +2,10 @@ import discord
 import time
 import pytz
 import json
+import re
 from discord.ext import commands
 from datetime import datetime
+
 
 # Embed Color Palette
 # Times - 0xE67A00
@@ -13,6 +15,7 @@ from datetime import datetime
 
 class Times(commands.Cog):
     """ Convert the current time into a variety of timezones """
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -46,12 +49,93 @@ class Times(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
+    async def timefor(self, ctx, user: discord.Member = None):
+        if user is None:
+            user = ctx.author
+        with open("./files/times/user_times.json", "r") as file:
+            user_times = json.load(file)
+        try:
+            tz = pytz.timezone(user_times["Times"][str(user.id)])
+        except KeyError:
+            embed = discord.Embed(
+                title="No timezone set",
+                description=f"{user} hasn't set their timezone",
+                color=0x800000
+            )
+            embed.set_footer(text="set your timezone using \"-timezoneset\"")
+            await ctx.send(embed=embed)
+            return
+        now = datetime.now(tz)
+        current_time = now.strftime("%I:%M %p, %B %d").lstrip('0')
+        if current_time[-2] == "0":
+            current_time = current_time[:-2] + current_time[-1]
+        embed = discord.Embed(
+            title=f"Current time for {user}",
+            description=f"{current_time}",
+            color=0xE67A00
+        )
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=['tzset'])
+    async def timezoneset(self, ctx, timezone):
+        user = str(ctx.author.id)
+        if timezone.upper() == "NONE":
+            with open("./files/times/user_times.json", "r") as file:
+                user_times = json.load(file)
+            user_times["Times"].pop(user)
+            with open("./files/times/user_times.json", "w") as file:
+                json.dump(user_times, file)
+            embed = discord.Embed(
+                title=f"Successfully removed timezone",
+                color=0x14CB10
+            )
+            embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
+            await ctx.send(embed=embed)
+            return
+
+        if not re.search("(GMT|UTC)(\+([0-9]$|1[0-4]$)|-([0-9]$|1[0-2]$))", timezone.upper()):
+            embed = discord.Embed(
+                title="Invalid timezone",
+                description="That timezone is either invalid or currently unavailable.\n"
+                            "Make sure to use GMT/UTC offsets, for example GMT-4",
+                color=0x800000
+            )
+            await ctx.send(embed=embed)
+            return
+        timezone = timezone.upper().replace("UTC", "GMT")
+
+        with open("./files/times/user_times.json", "r") as file:
+            user_times = json.load(file)
+        try:
+            user_timezone = user_times["Timezones"][timezone]
+        except KeyError:
+            embed = discord.Embed(
+                title="Invalid timezone",
+                description="That timezone is either invalid or currently unavailable.",
+                color=0x800000
+            )
+            await ctx.send(embed=embed)
+            return
+
+        user_times["Times"][user] = user_timezone
+        with open("./files/times/user_times.json", "w") as file:
+            json.dump(user_times, file)
+
+        embed = discord.Embed(
+            title=f"Timezone set successfully",
+            description=f"Your timezone has been set to {timezone}.",
+            color=0x14CB10
+        )
+        embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
+        await ctx.send(embed=embed)
+
+    @commands.command()
     async def times(self, ctx, *continents):
         """ Send an embed containing the current time in different timezones """
         tz_dict = {'Australia Eastern Standard Time [AEST]': pytz.timezone('Australia/Canberra'),
-		   'Australia Central Standard Time [ACST]': pytz.timezone('Australia/Adelaide'),
-		   'Australia Western Standard Time [AWST]': pytz.timezone('Australia/Perth'),
-		   'Indochina Time [ICT]': pytz.timezone('Asia/Phnom_Penh'),
+                   'Australia Central Standard Time [ACST]': pytz.timezone('Australia/Adelaide'),
+                   'Australia Western Standard Time [AWST]': pytz.timezone('Australia/Perth'),
+                   'Indochina Time [ICT]': pytz.timezone('Asia/Phnom_Penh'),
                    'Indian Standard Time [IST]': pytz.timezone('Asia/Kolkata'),
                    'Central European Time [CET]': pytz.timezone('CET'),
                    'Greenwich Mean Time [GMT]': pytz.timezone('GMT'),
@@ -79,9 +163,9 @@ class Times(commands.Cog):
         embed = discord.Embed(
             title=f"List of Available Timezones",
             description="AEST - Australia Eastern Standard Time\n"
-			"ACST - Australia Central Standard Time\n"
-			"AWST - Australia Western Standard Time\n"
-			"ICT - Indochina Time\n"
+                        "ACST - Australia Central Standard Time\n"
+                        "AWST - Australia Western Standard Time\n"
+                        "ICT - Indochina Time\n"
                         "IST - Indian Standard Time\n"
                         "CET - Central European Time\n"
                         "GMT - Greenwich Mean Time\n"
@@ -128,7 +212,7 @@ class Times(commands.Cog):
                 color=0xE00F00
             )
         embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
-        await message.edit(message=" ", embed=embed)
+        await message.edit(content=None, embed=embed)
 
     @time.error
     async def time_error(self, ctx, error):
