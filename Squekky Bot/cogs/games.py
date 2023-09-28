@@ -54,29 +54,6 @@ class Games(commands.Cog):
 
     @commands.command()
     @commands.is_owner()  # Owner-only command
-    async def suggestionlb(self, ctx, channel: discord.TextChannel):
-        channel = self.bot.get_channel(channel.id)  # Get the provided channel
-        embed = discord.Embed(
-            title=f"Most Upvoted Suggestions",
-            color=0x00CBE6
-        )
-        reactions = {}
-        async with ctx.typing():
-            messages = await channel.history(limit=None, oldest_first=False).flatten()
-            for message in messages:  # Iterate through all the messages
-                if not message.reactions:  # Continue if the message has no reactions
-                    continue
-                for reaction in message.reactions:
-                    if reaction.emoji == '👍':  # Add the message and the reaction count to a dictionary if upvoted
-                        reactions[f"{message.author}\n{message.jump_url}"] = reaction.count
-            sorted_reactions = sorted(reactions, key=reactions.get, reverse=True)  # Sort the dictionary high to low
-            for suggestion in sorted_reactions[0:10]:  # Create the leaderboard embed
-                placement = sorted_reactions.index(suggestion) + 1  # Calculate which place the suggestion is
-                embed.add_field(name=f"{placement}. {suggestion}", value=f"{reactions[suggestion]} 👍", inline=False)
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()  # Owner-only command
     async def reactionlb(self, ctx, channel: discord.TextChannel):
         embed = discord.Embed(
             title=f"Most Reactions in #{channel.name}",
@@ -105,14 +82,6 @@ class Games(commands.Cog):
         await ctx.send("<@!590719451322646548> check completed!")
         with open("./files/messages.json", 'w') as file:
             json.dump(str(sorted_reactions), file)
-
-    @commands.command()
-    @commands.is_owner()
-    async def purge(self, ctx, user: discord.Member, category: str):
-        uid = str(user.id)
-        await self.bot.pg_con.execute(f"DELETE FROM {category} WHERE user_id = $1", uid)
-        embed = discord.Embed(title=f"Removed {user} from {category} database", color=0x33FF66)
-        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.cooldown(1, 5, commands.BucketType.user)  # 5-second cooldown
@@ -195,6 +164,7 @@ class Games(commands.Cog):
 
     async def get_leaderboard(self, leaderboard, category, title, page):
         # await ctx.send(embed=await self.get_leaderboard("dice", "rolls", "Most Dice Rolls", page))
+        dm = await self.bot.fetch_user(590719451322646548)
         if page is None:
             page = 1
         elif page.isnumeric():
@@ -214,12 +184,35 @@ class Games(commands.Cog):
             title=f"{title} Leaderboard",
             color=0x00CBE6
         )
-        keys_left = len(leaderboard) - (page - 1) * keys_per_page
-        for index in range(min(keys_per_page, keys_left)):
-            uid = leaderboard[starting_index + index]
-            username = self.bot.get_user(int(uid['user_id']))
-            embed.add_field(name=f"{starting_index + index + 1}. {username}",
-                            value=f"{uid[category[0]]} {category[1]}", inline=False)
+        displayed_users = 0     # Number of users displayed on the page
+        skipped_users = 0   # Number of users that left
+        while displayed_users < keys_per_page and starting_index < len(leaderboard):
+            uid = leaderboard[starting_index]
+            user = self.bot.get_user(int(uid['user_id']))
+            if user is not None:
+                if title == "Flags":
+                    accuracy = round(uid[category[0]], 2)
+                    seconds = uid[category[1]]
+                    minutes = 0
+                    hours = 0
+                    if seconds / 60 >= 1:
+                        minutes = math.floor(seconds/60)
+                        seconds = seconds - minutes*60
+                        if minutes / 60 >= 1:
+                            hours = math.floor(minutes/60)
+                            minutes = minutes - hours*60
+                    if minutes / 10 < 1:
+                        minutes = f"0{minutes}"
+                    seconds = round(seconds, 2)
+                    embed.add_field(name=f"{starting_index + 1 - skipped_users}. {user}",
+                                    value=f"{accuracy}%, `{hours}:{minutes}:{seconds}`", inline=False)
+                else:
+                    embed.add_field(name=f"{starting_index + 1 - skipped_users}. {user}",
+                                    value=f"{uid[category[0]]} {category[1]}", inline=False)
+                displayed_users += 1
+            else:
+                skipped_users += 1
+            starting_index += 1
         embed.set_footer(text=f"Page {page}/{max_pages}")
         return embed
 
@@ -227,9 +220,17 @@ class Games(commands.Cog):
     async def leaderboard(self, ctx):
         """ If no leaderboard is provided """
         embed = discord.Embed(
-            title="Invalid leaderboard.",
-            description="Use `-leaderboards` to see the list of available leaderboards.",
-            color=0x800000
+            title="Leaderboard Categories",
+            description="**Use `-leaderboard (category)` to see the leaderboard of a category.**\n\n"
+                        "**Dice**\n"
+                        "`rolls`\n"
+                        "`score`\n"
+                        "`guess`\n\n"
+                        "**Yahtzee**\n"
+                        "`yahtzee`\n\n"
+                        "**Flags**\n"
+                        "`flags`",
+            color=0x00CBE6
         )
         await ctx.send(embed=embed)
 
@@ -258,21 +259,12 @@ class Games(commands.Cog):
         leaderboard = await self.bot.pg_con.fetch("SELECT * from yahtzee ORDER BY score DESC, user_id ASC")
         await ctx.send(embed=await self.get_leaderboard(leaderboard, ["score", ""], "Highest Yahtzee Score", page))
 
-    @commands.command(aliases=['lbs'])
-    async def leaderboards(self, ctx):
-        """ Provide a list of available leaderboards """
-        embed = discord.Embed(
-            title="Leaderboard Categories",
-            description="**Use `-leaderboard (category)` to see the leaderboard of a category.**\n\n"
-                        "**Dice**\n"
-                        "`rolls`\n"
-                        "`score`\n"
-                        "`guess`\n\n"
-                        "**Yahtzee**\n"
-                        "`yahtzee`",
-            color=0x00CBE6
-        )
-        await ctx.send(embed=embed)
+    @leaderboard.command(name='flags', aliases=['f'])
+    async def leaderboard_flags(self, ctx, page=None):
+        """ Flag Score/Time Leaderboard """
+        leaderboard = await self.bot.pg_con.fetch("SELECT * from flags ORDER BY accuracy DESC, time ASC,"
+                                                  "user_id ASC")
+        await ctx.send(embed=await self.get_leaderboard(leaderboard, ["accuracy", "time"], "Flags", page))
 
     @commands.group(invoke_without_command=True)
     async def stats(self, ctx):
@@ -477,19 +469,6 @@ class Games(commands.Cog):
             user = ctx.author
         await self.get_hangman_stats(user, ctx.channel, "companies")
 
-    @roll.error
-    async def roll_error(self, ctx, error):
-        blacklisted = []
-        if ctx.author.id in blacklisted:
-            return
-        elif isinstance(error, commands.MissingRequiredArgument):
-            embed = discord.Embed(
-                title="Make sure to include the amount of dice to roll and your guess!",
-                color=0x800000
-            )
-            await ctx.send(embed=embed)
-            error.error_handled = True
-
     @commands.command()
     @commands.is_owner()
     async def importdata(self, ctx, category):
@@ -515,6 +494,19 @@ class Games(commands.Cog):
                 await self.bot.pg_con.execute(f"INSERT INTO hangman_{category} (user_id, {category}, total)"
                                               f"VALUES ($1, $2, $3)", uid, word, total)
         print("SUCCESS")
+
+    @roll.error
+    async def roll_error(self, ctx, error):
+        blacklisted = []
+        if ctx.author.id in blacklisted:
+            return
+        elif isinstance(error, commands.MissingRequiredArgument):
+            embed = discord.Embed(
+                title="Make sure to include the amount of dice to roll and your guess!",
+                color=0x800000
+            )
+            await ctx.send(embed=embed)
+            error.error_handled = True
 
 
 async def setup(bot):
