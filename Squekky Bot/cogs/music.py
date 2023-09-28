@@ -15,6 +15,7 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    '''
     @commands.command(aliases=['sing'])
     @commands.cooldown(1, 10, commands.BucketType.user)  # 15-second cooldown
     async def lyrics(self, ctx, *songies):
@@ -119,12 +120,7 @@ class Music(commands.Cog):
         for artist in os.listdir('./files/songs/'):
             embed.add_field(name=artist, value=f"-songs {artist}", inline=False)
         await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()  # Owner-only command
-    async def join(self, ctx):
-        channel = ctx.author.voice.channel
-        await channel.connect()
+    '''
 
     @commands.command()
     @commands.is_owner()
@@ -163,6 +159,7 @@ class Music(commands.Cog):
 
         print("Done")
 
+    '''
     @lyrics.error
     async def lyrics_error(self, ctx, error):
         """ Let the user know if they aren't able to be messaged """
@@ -182,7 +179,7 @@ class Music(commands.Cog):
                 color=0x800000
             )
             await ctx.send(embed=embed)
-
+    '''
 
 async def setup(bot):
     await bot.add_cog(Music(bot))
