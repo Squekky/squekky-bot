@@ -1,3 +1,5 @@
+import os
+
 import discord
 import random
 import math
@@ -52,10 +54,10 @@ class Help(commands.Cog):
         info = ["`serverinfo`", "`rolecheck`", "`roleid`"]
         games = ["`hangman`", "`flags`", "`yahtzee`", "`roll`", "`wordle`", "`nerdle`"]
         stats = ["`disasters`", "`countries`", "`capitals`", "`states`", "`teams`", "`companies`", "`games`", "`stats`",
-                 "`leaderboard`", "`leaderboards`"]
+                 "`leaderboard`"]
         math = ["`prime`", "`factorial`", "`fibonacci`"]
-        time = ["`time`", "`times`", "`timezones`"]
-        music = ["`lyrics`", "`songs`", "`artists`"]
+        time = ["`timezoneset`", "`timefor`", "`time`", "`times`", "`timezones`"]
+        # music = ["`lyrics`", "`songs`", "`artists`"]
         # other = ["`ghost`", "`opt`"]
         # moderation = ["`kill`", "`revive`"]
         embed.add_field(name="General", value=f"{', '.join(general)}", inline=False)
@@ -64,7 +66,7 @@ class Help(commands.Cog):
         embed.add_field(name="Stats", value=f"{', '.join(stats)}", inline=False)
         embed.add_field(name="Math", value=f"{', '.join(math)}", inline=False)
         embed.add_field(name="Time", value=f"{', '.join(time)}", inline=False)
-        embed.add_field(name="Music", value=f"{', '.join(music)}", inline=False)
+        # embed.add_field(name="Music", value=f"{', '.join(music)}", inline=False)
         # embed.add_field(name="Other", value=f"{', '.join(other)}", inline=False)
         # embed.add_field(name="Moderation", value=f"{', '.join(moderation)}", inline=False)
         embed.set_author(name=f"Squekky Bot Commands", icon_url=f"{self.bot.user.avatar}")
@@ -278,21 +280,13 @@ class Help(commands.Cog):
     @help.group(name="leaderboard", invoke_without_command=True, aliases=['lb'])
     async def help_leaderboard(self, ctx):
         """ LEADERBOARD HELP """
-        embed = await get_help("leaderboard (category) [page]")
+        embed = await get_help("leaderboard [category]] [page]")
         embed.add_field(name="Show the leaderboard in a given category; Pages optional",
-                        value="Use `-leaderboards` to see the list of available leaderboards\n\n"
+                        value="Provides a list of available leaderboards if no category is provided\n\n"
                               "**Aliases:** lb\n"
                               "**Example:** -leaderboard score 3")
         await ctx.send(embed=embed)
 
-    @help.command(name='leaderboards', aliases=['lbs'])
-    async def help_leaderboards(self, ctx):
-        """ LEADERBOARDS HELP """
-        embed = await get_help("leaderboards")
-        embed.add_field(name="Provide a list of leaderboard categories\n",
-                        value="**Aliases:** lbs\n"
-                              "**Example:** -leaderboards")
-        await ctx.send(embed=embed)
 
     @help.command(name='prime')
     async def help_prime(self, ctx):
@@ -327,6 +321,25 @@ class Help(commands.Cog):
                               "**Example:** -fibonacci 16")
         await ctx.send(embed=embed)
 
+    @help.command(name='timezoneset')
+    async def help_timezoneset(self, ctx):
+        """ TIMEZONESET HELP """
+        embed = await get_help("timezoneset (timezone)")
+        embed.add_field(name="Set your timezone using GMT/UTC offsets",
+                        value="\n\n"
+                              "**Aliases:** tzset\n"
+                              "**Example:** -timezoneset gmt-4")
+        await ctx.send(embed=embed)
+    
+    @help.command(name='timefor')
+    async def help_timefor(self, ctx):
+        """ TIMEFOR HELP """
+        embed = await get_help("timefor [user]]")
+        embed.add_field(name="Check the current time for a specific user, or yourself if no user is provided",
+                        value="If the user has their timezone set, provides the current local time for them\n\n"
+                              "**Example:** -timefor squekky")
+        await ctx.send(embed=embed)
+
     @help.command(name='time')
     async def help_time(self, ctx):
         """ TIME HELP """
@@ -353,6 +366,7 @@ class Help(commands.Cog):
                               "**Example:** -timezones")
         await ctx.send(embed=embed)
 
+    '''
     @help.command(name='lyrics', aliases=['sing'])
     async def help_lyrics(self, ctx):
         """ LYRICS HELP """
@@ -382,7 +396,7 @@ class Help(commands.Cog):
                         value="**Example:** -artists")
         await ctx.send(embed=embed)
 
-    '''
+    
     @help.command(name='ghost')
     async def help_ghost(self, ctx):
         """ GHOST HELP """
@@ -430,6 +444,7 @@ class Help(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        error_path = "/home/squekky/squekkybot/errors"
         if hasattr(error, 'error_handled'):
             return
         elif isinstance(error, commands.CommandNotFound):
@@ -450,16 +465,17 @@ class Help(commands.Cog):
             embed.set_author(name=f"{ctx.author}", icon_url=f"{ctx.author.avatar}")
             await ctx.send(embed=embed)
         elif isinstance(error, commands.NotOwner):
-            print(f"[{ctx.command}] {ctx.author} attempted to use an owner-only command.")
+            os.system(f"echo \"[{ctx.command}] {ctx.author} attempted to use an owner-only "
+                          f"command.\" >> {error_path}")
         elif isinstance(error, commands.MissingPermissions):
-            print(f"[{ctx.command}] {ctx.author} does not have the required permissions.\n"
-                  f"Permission: {error.args[0]}")
+            os.system(f"echo \"[{ctx.command}] {ctx.author} does not have the required permissions.\n"
+                  f"Permission: {error.args[0]}\" >> {error_path}")
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
             ctx.command.reset_cooldown(ctx)
         else:
-            print(f"[{ctx.command}] {error.args[0]}")
-            print(error.args)
+            os.system(f"echo \"[{ctx.command}] {error.args[0]}\" >> {error_path}")
+            os.system(f"echo \"{error.args}\" >> {error_path}")
 
 
 async def setup(bot):
