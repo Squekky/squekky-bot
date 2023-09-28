@@ -435,51 +435,53 @@ class Hangman(commands.Cog):
         embed.set_footer(text=f"From {total_points} data points")
         await ctx.send(embed=embed)
 
-    #@commands.command()
-    #@commands.is_owner()
-    #async def graph(self, ctx, category):
-    #    if category.title() not in ["Disasters", "Games", "Countries", "States", "Teams", "Companies"]:  # Make sure
-    #        # it is a category
-    #        await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
-    #        return
-    #    category = category.lower()
-    #    with open("./files/hangman/words.json", 'r') as file:
-    #        words = json.load(file)[category.title()]
-    #    frequency = {}
-    #    data_points = 0;
-    #    for word in words:
-    #        total_count = 0
-    #        totals = await self.bot.pg_con.fetch(f"SELECT total FROM hangman_{category} WHERE {category} = $1", word)
-    #        for total in totals:
-    #            total_count += total['total']
-    #        frequency[word] = total_count
-    #        data_points += total_count
-    #    words = list(frequency.keys())
-    #    amounts = list(frequency.values())
-    #
-    #    fig, ax = plt.subplots(figsize=(25, 37.5))
-    #
-    #    ax.barh(words, amounts, height=0.8, color=['dodgerblue', 'deepskyblue'], align='center', edgecolor='white', linewidth=1)
-    #    ax.xaxis.set_tick_params(pad=1)
-    #    ax.yaxis.set_tick_params(pad=1)
-    #    ax.grid(b=True, color='grey',
-    #            linestyle='-.', linewidth=0.5,
-    #            alpha=0.2)
-    #    ax.invert_yaxis()
-    #    for i in ax.patches:
-    #        plt.text(i.get_width() + 0.1, i.get_y() + 0.7,
-    #                 str(round((i.get_width()), 2)),
-    #                 fontsize=1440*math.pow(len(frequency), -0.95), fontweight='bold',
-    #                 color='grey')
-    #    ax.set_title(f'Hangman {category.title()} Frequency - {data_points} data points',
-    #                 loc='left', fontsize=35)
-    #    plt.margins(y=0.001)
-    #    plt.yticks(fontsize=1390*math.pow(len(frequency), -0.95))
-    #    plt.savefig("./files/graph.png", bbox_inches='tight')
-    #    plt.close(fig)
-    #    file = discord.File("./files/graph.png")
-    #    await ctx.send(file=file)
-    #    return
+    '''
+    @commands.command()
+    @commands.is_owner()
+    async def graph(self, ctx, category):
+        if category.title() not in ["Disasters", "Games", "Countries", "States", "Teams", "Companies"]:  # Make sure
+            # it is a category
+            await ctx.invoke(self.bot.get_command(f'help {ctx.command}'))
+            return
+        category = category.lower()
+        with open("./files/hangman/words.json", 'r') as file:
+            words = json.load(file)[category.title()]
+        frequency = {}
+        data_points = 0;
+        for word in words:
+            total_count = 0
+            totals = await self.bot.pg_con.fetch(f"SELECT total FROM hangman_{category} WHERE {category} = $1", word)
+            for total in totals:
+                total_count += total['total']
+            frequency[word] = total_count
+            data_points += total_count
+        words = list(frequency.keys())
+        amounts = list(frequency.values())
+    
+        fig, ax = plt.subplots(figsize=(25, 37.5))
+    
+        ax.barh(words, amounts, height=0.8, color=['dodgerblue', 'deepskyblue'], align='center', edgecolor='white', linewidth=1)
+        ax.xaxis.set_tick_params(pad=1)
+        ax.yaxis.set_tick_params(pad=1)
+        ax.grid(b=True, color='grey',
+                linestyle='-.', linewidth=0.5,
+                alpha=0.2)
+        ax.invert_yaxis()
+        for i in ax.patches:
+            plt.text(i.get_width() + 0.1, i.get_y() + 0.7,
+                     str(round((i.get_width()), 2)),
+                     fontsize=1440*math.pow(len(frequency), -0.95), fontweight='bold',
+                     color='grey')
+        ax.set_title(f'Hangman {category.title()} Frequency - {data_points} data points',
+                     loc='left', fontsize=35)
+        plt.margins(y=0.001)
+        plt.yticks(fontsize=1390*math.pow(len(frequency), -0.95))
+        plt.savefig("./files/graph.png", bbox_inches='tight')
+        plt.close(fig)
+        file = discord.File("./files/graph.png")
+        await ctx.send(file=file)
+        return
+    '''
 
     @commands.command()
     @commands.is_owner()
