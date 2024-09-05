@@ -94,5 +94,5 @@ Provide a list of available timezones
 Set your timezone using GMT/UTC offsets
 
 * **timefor** [user]  
-heck the current time for a specific user, or yourself if no user is provided
+Check the current time for a specific user, or yourself if no user is provided
 
